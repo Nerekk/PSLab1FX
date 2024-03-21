@@ -9,19 +9,28 @@ public class Server {
     private ServerSocket serverSocket;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
-    private ServerController serverController;
+    private final ServerController c;
 
-    public Server(ServerController serverController) throws IOException {
-        this.serverController = serverController;
-        this.serverSocket = new ServerSocket();
+    public Server(ServerController c) {
+        this.c = c;
     }
 
     public void start(Integer port) {
-
+        try {
+            this.serverSocket = new ServerSocket(port);
+        } catch (IOException e) {
+            c.setLabelInfo("Socket input error!");
+            throw new RuntimeException(e);
+        }
+        c.setLabelInfo("OK!");
     }
 
-    public void stop() throws IOException {
-        this.serverSocket.close();
+    public void stop() {
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

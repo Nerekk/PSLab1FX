@@ -26,35 +26,60 @@ public class ServerController implements Initializable {
     private TextArea serverTextArea;
     @FXML
     private TextField serverTextField;
+    public final static String STATUS_ON = "ON";
+    public final static String STATUS_OFF = "OFF";
 
     private Server server;
 
     @FXML
     protected void serverStart() {
+        Integer port;
         try {
-            Integer port = Integer.parseInt(serverTextField.getText());
-            server.start(port);
+            port = Integer.parseInt(serverTextField.getText());
         } catch (NumberFormatException e) {
+            setLabelInfo("Given port is not number!");
             throw new RuntimeException(e);
         }
-
+        server.start(port);
+        switchButtonsLock();
+        setLabelStatus(STATUS_ON);
     }
 
     @FXML
     protected void serverStop() {
-        try {
-            server.stop();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        server.stop();
+        switchButtonsLock();
+        setLabelStatus(STATUS_OFF);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            this.server = new Server(this);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        this.server = new Server(this);
+    }
+
+    public void setLabelStatus(String s) {
+        labelStatus.setText(s);
+    }
+
+    public void setLabelInfo(String s) {
+        labelInfo.setText(s);
+    }
+
+    public void setButtonStartLock(boolean lock) {
+        buttonStart.setDisable(lock);
+    }
+
+    public void setButtonStopLock(boolean lock) {
+        buttonStop.setDisable(lock);
+    }
+
+    public void switchButtonsLock() {
+        if (buttonStart.isDisabled()) {
+            setButtonStartLock(false);
+            setButtonStopLock(true);
+        } else {
+            setButtonStartLock(true);
+            setButtonStopLock(false);
         }
     }
 }
