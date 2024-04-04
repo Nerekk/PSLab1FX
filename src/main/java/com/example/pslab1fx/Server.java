@@ -14,7 +14,7 @@ public class Server implements Runnable{
     private DataOutputStream output;
     private DataInputStream input;
     private final ServerController c;
-    private Thread t1 = new Thread(this::serverThread);
+    private Thread t1;
     private boolean isThreadRunning;
     private boolean isClientConnected = false;
 
@@ -38,20 +38,26 @@ public class Server implements Runnable{
     public void waitForClient() {
         try {
 
-            System.out.println("Waiting for client..");
+            Platform.runLater(() -> c.sendAlert("Waiting for client.."));
             socket = serverSocket.accept();
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
 
-            System.out.println("Client connected!");
+            Platform.runLater(() -> c.sendAlert("Client connected!"));
             isClientConnected = true;
 
             // pobierz wiadomosc, wyslij wiadomosc i zakoncz polaczenie z klientem
+            String messageFromClient = input.readUTF();
+            Platform.runLater(() -> c.sendAlert("Message: " + messageFromClient));
+
+            output.writeUTF(messageFromClient);
+            Platform.runLater(() -> c.sendAlert("Sending message back to client"));
 
             socket.close();
+            Platform.runLater(() -> c.sendAlert("Client disconnected by server"));
         } catch (IOException e) {
             if (isClientConnected)
-                System.out.println("Client disconnected!");
+                Platform.runLater(() -> c.sendAlert("Client disconnected by exception!"));
         }
     }
 
@@ -59,10 +65,12 @@ public class Server implements Runnable{
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            c.setLabelInfo("Socket input error!");
-            throw new RuntimeException(e);
+            c.sendAlert("Socket input error!");
+            return;
         }
-        c.setLabelInfo("Server started");
+        c.sendAlert("Server started");
+        t1 = new Thread(this::serverThread);
+        run();
     }
 
     public void stop() {
@@ -76,7 +84,7 @@ public class Server implements Runnable{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        c.setLabelInfo("Server closed");
+        c.sendAlert("Server closed");
 
     }
 
