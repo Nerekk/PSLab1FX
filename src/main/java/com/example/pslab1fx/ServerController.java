@@ -9,13 +9,13 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class ServerController implements Initializable {
     @FXML
     private Label labelStatus;
-    @FXML
-    private Label labelInfo;
 
     @FXML
     private Button buttonStart;
@@ -37,8 +37,8 @@ public class ServerController implements Initializable {
         try {
             port = Integer.parseInt(serverTextField.getText());
         } catch (NumberFormatException e) {
-            setLabelInfo("Given port is not number!");
-            throw new RuntimeException(e);
+            sendAlert("Given port is not number!");
+            return;
         }
         server.start(port);
         switchButtonsLock();
@@ -61,10 +61,6 @@ public class ServerController implements Initializable {
         labelStatus.setText(s);
     }
 
-    public void setLabelInfo(String s) {
-        labelInfo.setText(s);
-    }
-
     public void setButtonStartLock(boolean lock) {
         buttonStart.setDisable(lock);
     }
@@ -81,5 +77,19 @@ public class ServerController implements Initializable {
             setButtonStartLock(true);
             setButtonStopLock(false);
         }
+    }
+
+    public void sendAlert(String alert) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String currentTimeString = "[" + currentTime.format(formatter) + "]";
+        String sta = serverTextArea.getText();
+        String info;
+        if (sta.isEmpty()) {
+            info = currentTimeString + " " + alert;
+        } else {
+            info = "\n" + currentTimeString + " " + alert;
+        }
+        serverTextArea.appendText(info);
     }
 }
