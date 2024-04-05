@@ -26,8 +26,12 @@ public class ServerController implements Initializable {
     private TextArea serverTextArea;
     @FXML
     private TextField serverTextField;
+
     public final static String STATUS_ON = "ON";
     public final static String STATUS_OFF = "OFF";
+    public final static int INFO = 0;
+    public final static int ECHO = 1;
+    public final static int ERROR = 2;
 
     private Server server;
 
@@ -36,7 +40,7 @@ public class ServerController implements Initializable {
         try {
             port = Integer.parseInt(serverTextField.getText());
         } catch (NumberFormatException e) {
-            sendAlert("Given port is not number!");
+            sendAlert(ERROR, "Given port is not number!");
             return -1;
         }
         return port;
@@ -86,17 +90,25 @@ public class ServerController implements Initializable {
         }
     }
 
-    public void sendAlert(String alert) {
+    public void sendAlert(int type, String alert) {
         LocalDateTime currentTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String currentTimeString = "[" + currentTime.format(formatter) + "]";
         String sta = serverTextArea.getText();
+
+        switch (type) {
+            case INFO -> alert = "[INFO] " + alert;
+            case ECHO -> alert = "[ECHO] " + alert;
+            case ERROR -> alert = "[ERROR] " + alert;
+        }
+
         String info;
         if (sta.isEmpty()) {
             info = currentTimeString + " " + alert;
         } else {
             info = "\n" + currentTimeString + " " + alert;
         }
+
         serverTextArea.appendText(info);
     }
 }

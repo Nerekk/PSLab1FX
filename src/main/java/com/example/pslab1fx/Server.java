@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import static com.example.pslab1fx.ServerController.*;
+
 public class Server implements Runnable{
     private ServerSocket serverSocket;
     private Socket socket;
@@ -38,29 +40,29 @@ public class Server implements Runnable{
     public void waitForClient() {
         try {
 
-            Platform.runLater(() -> c.sendAlert("Waiting for client.."));
+            Platform.runLater(() -> c.sendAlert(INFO, "Waiting for client.."));
             socket = serverSocket.accept();
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
 
-            Platform.runLater(() -> c.sendAlert("Client connected!"));
+            Platform.runLater(() -> c.sendAlert(INFO, "Client connected!"));
             isClientConnected = true;
 
 
             // pobierz wiadomosc, wyslij wiadomosc
             while (isThreadRunning) {
                 String messageFromClient = input.readUTF();
-                Platform.runLater(() -> c.sendAlert("Message [" + messageFromClient.getBytes().length + " bytes]: " + messageFromClient));
+                Platform.runLater(() -> c.sendAlert(ECHO, "Message [" + messageFromClient.getBytes().length + " bytes]: " + messageFromClient));
 
                 output.writeUTF(messageFromClient);
-                Platform.runLater(() -> c.sendAlert("Sending message back to client"));
+                Platform.runLater(() -> c.sendAlert(ECHO, "Sending message back to client"));
             }
 
             socket.close();
-            Platform.runLater(() -> c.sendAlert("Client disconnected by server"));
+            Platform.runLater(() -> c.sendAlert(INFO, "Client disconnected by server"));
         } catch (IOException e) {
             if (isClientConnected)
-                Platform.runLater(() -> c.sendAlert("Client disconnected!"));
+                Platform.runLater(() -> c.sendAlert(ERROR, "Client disconnected!"));
         }
     }
 
@@ -68,10 +70,10 @@ public class Server implements Runnable{
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            c.sendAlert("Socket input error!");
+            c.sendAlert(ERROR, "Socket input error!");
             return;
         }
-        c.sendAlert("Server started");
+        c.sendAlert(INFO, "Server started");
         t1 = new Thread(this::serverThread);
         run();
     }
@@ -87,7 +89,7 @@ public class Server implements Runnable{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        c.sendAlert("Server closed");
+        c.sendAlert(INFO, "Server closed");
 
     }
 
