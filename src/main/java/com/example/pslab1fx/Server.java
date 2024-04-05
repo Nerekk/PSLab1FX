@@ -46,18 +46,21 @@ public class Server implements Runnable{
             Platform.runLater(() -> c.sendAlert("Client connected!"));
             isClientConnected = true;
 
-            // pobierz wiadomosc, wyslij wiadomosc i zakoncz polaczenie z klientem
-            String messageFromClient = input.readUTF();
-            Platform.runLater(() -> c.sendAlert("Message: " + messageFromClient));
 
-            output.writeUTF(messageFromClient);
-            Platform.runLater(() -> c.sendAlert("Sending message back to client"));
+            // pobierz wiadomosc, wyslij wiadomosc
+            while (isThreadRunning) {
+                String messageFromClient = input.readUTF();
+                Platform.runLater(() -> c.sendAlert("Message: " + messageFromClient));
+
+                output.writeUTF(messageFromClient);
+                Platform.runLater(() -> c.sendAlert("Sending message back to client"));
+            }
 
             socket.close();
             Platform.runLater(() -> c.sendAlert("Client disconnected by server"));
         } catch (IOException e) {
             if (isClientConnected)
-                Platform.runLater(() -> c.sendAlert("Client disconnected by exception!"));
+                Platform.runLater(() -> c.sendAlert("Client disconnected!"));
         }
     }
 
