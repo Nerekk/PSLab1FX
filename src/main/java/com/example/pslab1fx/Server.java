@@ -50,7 +50,7 @@ public class Server implements Runnable{
             // pobierz wiadomosc, wyslij wiadomosc
             while (isThreadRunning) {
                 String messageFromClient = input.readUTF();
-                Platform.runLater(() -> c.sendAlert("Message: " + messageFromClient));
+                Platform.runLater(() -> c.sendAlert("Message [" + messageFromClient.getBytes().length + " bytes]: " + messageFromClient));
 
                 output.writeUTF(messageFromClient);
                 Platform.runLater(() -> c.sendAlert("Sending message back to client"));
