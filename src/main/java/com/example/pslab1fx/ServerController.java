@@ -31,15 +31,22 @@ public class ServerController implements Initializable {
 
     private Server server;
 
-    @FXML
-    protected void serverStart() {
+    public Integer getPort() {
         Integer port;
         try {
             port = Integer.parseInt(serverTextField.getText());
         } catch (NumberFormatException e) {
             sendAlert("Given port is not number!");
-            return;
+            return -1;
         }
+        return port;
+    }
+
+    @FXML
+    protected void serverStart() {
+        Integer port = getPort();
+        if (port == -1) return;
+
         server.start(port);
         switchButtonsLock();
         setLabelStatus(STATUS_ON);
