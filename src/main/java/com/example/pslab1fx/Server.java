@@ -12,13 +12,9 @@ import static com.example.pslab1fx.ServerController.*;
 
 public class Server implements Runnable{
     private ServerSocket serverSocket;
-    private Socket socket;
-    private DataOutputStream output;
-    private DataInputStream input;
     private final ServerController c;
     private Thread t1;
-    private boolean isThreadRunning;
-    private boolean isClientConnected = false;
+    public static boolean isThreadRunning;
 
     public Server(ServerController c) {
         this.c = c;
@@ -32,37 +28,21 @@ public class Server implements Runnable{
 
     private void serverThread() {
         while (isThreadRunning) {
-            waitForClient();
-            // zamykanie serwera - metoda przypisana do przycisku
+            listenForClient();
         }
     }
 
-    public void waitForClient() {
+    public void listenForClient() {
         try {
-
-            Platform.runLater(() -> c.sendAlert(INFO, "Waiting for client.."));
-            socket = serverSocket.accept();
-            input = new DataInputStream(socket.getInputStream());
-            output = new DataOutputStream(socket.getOutputStream());
-
-            Platform.runLater(() -> c.sendAlert(INFO, "Client connected!"));
-            isClientConnected = true;
-
-
-            // pobierz wiadomosc, wyslij wiadomosc
+            Platform.runLater(() -> c.sendAlert(INFO, "Waiting for clients.."));
             while (isThreadRunning) {
-                String messageFromClient = input.readUTF();
-                Platform.runLater(() -> c.sendAlert(ECHO, "Message [" + messageFromClient.getBytes().length + " bytes]: " + messageFromClient));
-
-                output.writeUTF(messageFromClient);
-                Platform.runLater(() -> c.sendAlert(ECHO, "Sending message back to client"));
+                Socket socket = serverSocket.accept();
+                Platform.runLater(() -> c.sendAlert(INFO, "New client connected!"));
+                c.addClientToList(socket);
             }
 
-            socket.close();
-            Platform.runLater(() -> c.sendAlert(INFO, "Client disconnected by server"));
         } catch (IOException e) {
-            if (isClientConnected)
-                Platform.runLater(() -> c.sendAlert(ERROR, "Client disconnected!"));
+            // zamkniecie server socketa powoduje wyjście z tej metody za pomocą tego wyjątku
         }
     }
 
@@ -70,7 +50,7 @@ public class Server implements Runnable{
         try {
             this.serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            c.sendAlert(ERROR, "Socket input error!");
+            c.sendAlert(ERROR, "Socket creating error!");
             return;
         }
         c.sendAlert(INFO, "Server started");
@@ -82,15 +62,11 @@ public class Server implements Runnable{
         try {
             isThreadRunning = false;
             this.serverSocket.close();
-
-            if (isClientConnected)
-                socket.close();
-
+            c.removeAllClientsFromList();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         c.sendAlert(INFO, "Server closed");
-
     }
 
 
