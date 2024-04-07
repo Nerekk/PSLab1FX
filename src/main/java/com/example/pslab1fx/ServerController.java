@@ -155,12 +155,12 @@ public class ServerController implements Initializable {
     }
 
     public synchronized void removeClientFromList(Socket socket) throws IOException {
-        String s = socket.getInetAddress().toString();
+        String address = socket.getInetAddress().toString() + ":" + socket.getPort();
 
         for (int i = 0; i < clients.size(); i++) {
-            String clientIp = clients.get(i).getIp();
+            String clientAddress = clients.get(i).getAddress();
 
-            if (Objects.equals(s, clientIp)) {
+            if (Objects.equals(address, clientAddress)) {
                 killClient(i);
                 break;
             }
