@@ -1,11 +1,10 @@
 package com.example.pslab1fx;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -26,6 +25,13 @@ public class ServerController implements Initializable {
     private TextArea serverTextArea;
     @FXML
     private TextField serverTextField;
+
+    @FXML
+    private Label clientCounter;
+
+    ObservableList<String> clients = FXCollections.observableArrayList();
+    @FXML
+    private ListView<String> clientList;
 
     public final static String STATUS_ON = "ON";
     public final static String STATUS_OFF = "OFF";
@@ -66,6 +72,7 @@ public class ServerController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.server = new Server(this);
+        clientList.setItems(clients);
     }
 
     public void setLabelStatus(String s) {
