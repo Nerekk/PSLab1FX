@@ -5,8 +5,10 @@ import javafx.application.Platform;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import static com.example.pslab1fx.ServerController.*;
 
@@ -48,7 +50,9 @@ public class Server implements Runnable{
 
     public void start(Integer port) {
         try {
-            this.serverSocket = new ServerSocket(port);
+            this.serverSocket = new ServerSocket();
+            SocketAddress address = new InetSocketAddress(port);
+            this.serverSocket.bind(address);
         } catch (IOException e) {
             c.sendAlert(ERROR, "Socket creating error!");
             return;
