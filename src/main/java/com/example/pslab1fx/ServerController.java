@@ -143,6 +143,11 @@ public class ServerController implements Initializable {
     public void setCounter(int size) {
         counter.setValue(size);
     }
+
+    public int getCounter() {
+        return counter.getValue();
+    }
+
     public synchronized void addClientToList(Socket socket) {
         ClientEcho clientEcho = new ClientEcho(++incrementer, socket, this);
 
