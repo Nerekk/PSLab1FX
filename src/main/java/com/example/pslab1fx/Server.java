@@ -18,6 +18,11 @@ public class Server implements Runnable{
     private Thread t1;
     public static boolean isThreadRunning;
 
+    private static final int MAX_CLIENTS = 3; // set to 0 for unlimited
+    private static final int BUSY = 2;
+    private static final int ALLOWED = 1;
+    private static final int DENIED = 0;
+
     public Server(ServerController c) {
         this.c = c;
     }
@@ -39,6 +44,17 @@ public class Server implements Runnable{
             Platform.runLater(() -> c.sendAlert(INFO, "Waiting for clients.."));
             while (isThreadRunning) {
                 Socket socket = serverSocket.accept();
+                DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+
+                if (MAX_CLIENTS > 0 && c.getCounter() >= MAX_CLIENTS) {
+                    output.writeInt(BUSY);
+                    output.close();
+
+                    socket.close();
+                    continue;
+                }
+                output.writeInt(ALLOWED);
+
                 Platform.runLater(() -> c.sendAlert(INFO, "New client connected!"));
                 c.addClientToList(socket);
             }
