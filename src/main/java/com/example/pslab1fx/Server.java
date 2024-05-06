@@ -67,7 +67,7 @@ public class Server implements Runnable{
     public void start(Integer port) {
         try {
             this.serverSocket = new ServerSocket();
-            SocketAddress address = new InetSocketAddress(port);
+            SocketAddress address = new InetSocketAddress("0.0.0.0", port);
             this.serverSocket.bind(address);
         } catch (IOException e) {
             c.sendAlert(ERROR, "Socket creating error!");
