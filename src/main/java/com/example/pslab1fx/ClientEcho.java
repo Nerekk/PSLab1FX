@@ -77,4 +77,14 @@ public class ClientEcho implements Runnable {
     public DataInputStream getInput() {
         return input;
     }
+
+    @Override
+    public String toString() {
+        return "ClientEcho{" +
+                "output=" + output +
+                ", socket=" + socket +
+                ", address='" + address + '\'' +
+                ", id=" + id +
+                '}';
+    }
 }
