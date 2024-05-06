@@ -174,8 +174,9 @@ public class ServerController implements Initializable {
     }
 
     public synchronized void removeAllClientsFromList() throws IOException {
-        for (int i = 0; i < clients.size(); i++) {
-            killClient(i);
+        int size = clients.size();
+        for (int i = 0; i < size; i++) {
+            killClient(0);
         }
         setCounter(clients.size());
     }
@@ -185,7 +186,6 @@ public class ServerController implements Initializable {
         clientEcho.getSocket().close();
         clientEcho.getInput().close();
         clientEcho.getOutput().close();
-
         threadMap.get(clientEcho.getId()).interrupt();
         threadMap.remove(clientEcho.getId());
         clients.remove(i);
